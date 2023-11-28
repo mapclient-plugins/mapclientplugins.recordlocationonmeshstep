@@ -1,0 +1,6 @@
+
+<RCC>
+  <qresource prefix="recordlocationonmeshstep">
+    <file>images/segmentation.png</file>
+  </qresource>
+</RCC>
