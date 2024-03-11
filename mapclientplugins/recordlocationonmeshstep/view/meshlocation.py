@@ -73,6 +73,7 @@ class MeshLocationWidget(QtWidgets.QWidget):
         self._ui.widgetZinc.handler_activated.connect(self._update_label_text)
         self._ui.widgetZinc.pixel_scale_changed.connect(self._pixel_scale_changed)
         self._ui.checkBoxMeshVisibility.stateChanged.connect(self._scene.set_mesh_visibility)
+        self._ui.checkBoxSurfacesVisibility.stateChanged.connect(self._scene.set_surface_visibility)
         self._ui.spinBoxNodeSize.valueChanged.connect(self._scene.set_node_size)
         selection_model = self._ui.listViewMarkers.selectionModel()
         selection_model.currentRowChanged.connect(self._widget_mapper.setCurrentModelIndex)
@@ -141,4 +142,3 @@ def _calculate_best_fit_plane(points):
     U, S, Vh = np.linalg.svd(actual_points - centroid)
 
     return centroid.reshape(-1).tolist(), U[:, -1].tolist()
-

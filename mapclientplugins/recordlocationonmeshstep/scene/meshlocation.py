@@ -9,6 +9,7 @@ class MeshLocationScene(object):
     def __init__(self, model):
         self._model = model
         self._mesh_lines = None
+        self._surface_graphics = None
         self._label_graphics = None
         self._point_graphics = None
         self._pixel_scale = 1.0
@@ -17,8 +18,12 @@ class MeshLocationScene(object):
     def set_mesh_visibility(self, state):
         self._mesh_lines.setVisibilityFlag(state != 0)
 
+    def set_surface_visibility(self, state):
+        self._surface_graphics.setVisibilityFlag(state != 0)
+
     def update_mesh_coordinates(self, coordinate_field):
         self._mesh_lines.setCoordinateField(coordinate_field)
+        self._surface_graphics.setCoordinateField(coordinate_field)
         self._point_graphics.setCoordinateField(coordinate_field)
 
     def update_label_text(self, handler_label):
@@ -48,6 +53,7 @@ class MeshLocationScene(object):
             scene.removeAllGraphics()
             line_graphic = scene.createGraphicsLines()
             line_graphic.setMaterial(green)
+            surface_graphic = scene.createGraphicsSurfaces()
             point_graphic = scene.createGraphicsPoints()
             point_graphic.setFieldDomainType(Field.DOMAIN_TYPE_DATAPOINTS)
             attributes = point_graphic.getGraphicspointattributes()
@@ -55,6 +61,7 @@ class MeshLocationScene(object):
             attributes.setBaseSize(self._point_base_size)
 
         self._mesh_lines = line_graphic
+        self._surface_graphics = surface_graphic
         self._point_graphics = point_graphic
 
         normalised_region = self._model.get_label_region()
