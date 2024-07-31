@@ -66,6 +66,9 @@ class MeshLocationWidget(QtWidgets.QWidget):
     def register_done_execution(self, done_execution):
         self._callback = done_execution
 
+    def get_recorded_mesh_locations(self):
+        return self._widget_mapper.model().serialise()
+
     def _make_connections(self):
         self._ui.pushButtonContinue.clicked.connect(self._continue_execution)
         self._ui.pushButtonViewAll.clicked.connect(self._view_all_button_clicked)

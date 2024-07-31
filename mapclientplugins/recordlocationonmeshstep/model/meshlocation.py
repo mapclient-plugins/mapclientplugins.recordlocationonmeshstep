@@ -84,6 +84,16 @@ class Marker:
 
         return f'{value}'
 
+    def position(self):
+        node_set = self._node.getNodeset()
+        fm = node_set.getFieldmodule()
+        with ChangeManager(fm):
+            fc = fm.createFieldcache()
+            fc.setNode(self._node)
+            result, value = self._coordinate_field.evaluateReal(fc, 3)
+
+        return f'{value}'
+
     def set_scale(self, scale):
         self._pixel_scale = scale
 
@@ -164,6 +174,22 @@ class MarkerListModel(QtCore.QAbstractTableModel):
         self.beginResetModel()
         self._markers = markers
         self.endResetModel()
+
+    def serialise(self):
+        p = []
+        for marker in self._markers:
+            p.append({
+                'identifier': marker.identifier(),
+                'label': marker.name(),
+                'orientation': marker.orientation(),
+                'position': marker.position(),
+                'scale': marker.scale()
+            })
+        return {
+            'version': '0.1.0',
+            'id': 'mesh-location-orientation',
+            'locations': p
+        }
 
     def new(self, node, coordinate_field):
         m = Marker(node, coordinate_field)

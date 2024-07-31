@@ -31,10 +31,9 @@ class RecordLocationonMeshStep(WorkflowStepMountPoint):
                       'http://physiomeproject.org/workflow/1.0/rdf-schema#file_location'))
         self.addPort(('http://physiomeproject.org/workflow/1.0/rdf-schema#port',
                       'http://physiomeproject.org/workflow/1.0/rdf-schema#provides',
-                      'https://physiomeproject.org/workflow/1.0/rdf-schema#mesh_location'))
+                      'http://physiomeproject.org/workflow/1.0/rdf-schema#dict'))
         # Port data:
         self._input_mesh_file = None  # http://physiomeproject.org/workflow/1.0/rdf-schema#file_location
-        self._output_mesh_location = None  # https://physiomeproject.org/workflow/1.0/rdf-schema#mesh_location
         # Config:
         self._config = {
             'identifier': '',
@@ -79,7 +78,7 @@ class RecordLocationonMeshStep(WorkflowStepMountPoint):
 
         :param index: Index of the port to return.
         """
-        return self._output_mesh_location  # https://physiomeproject.org/workflow/1.0/rdf-schema#mesh_location
+        return self._view.get_recorded_mesh_locations()  # https://physiomeproject.org/workflow/1.0/rdf-schema#mesh_location
 
     def configure(self):
         """
