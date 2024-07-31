@@ -48,13 +48,13 @@ class MeshLocationWidget(QtWidgets.QWidget):
         self._ui.labelMeshLocationIdentifier.setText(identifier)
 
     def load(self, mesh_file_location):
-        self._scene.setup_visualisation()
         self._load_settings()
 
         # self._input_hash = _generate_hash(points_file_location)
         # if self._input_hash == previous_hash:
         #     points_file_location = self.get_output_file()
         self._model.load(mesh_file_location)
+        self._scene.setup_visualisation()
         self._setup_field_combo_boxes()
 
     def clear(self):
@@ -115,6 +115,7 @@ class MeshLocationWidget(QtWidgets.QWidget):
 
     def _remove_ui_region(self):
         self._model.remove_label_region()
+        self._model.remove_mesh_region()
 
     def _load_settings(self):
         if os.path.isfile(self._settings_file()):

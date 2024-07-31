@@ -230,23 +230,29 @@ class MeshLocationModel:
         self._context = Context("MeshLocation")
         self._root_region = self._context.getDefaultRegion()
 
-        self._label_region = self._root_region.createChild("_label")
-        field_module = self._label_region.getFieldmodule()
-        self._label_coordinates_field = create_field_finite_element(field_module, 'normalised', 2)
-        create_nodes(self._label_coordinates_field, [[10.0, 10.0]])
-
-        self._mesh_region = self._root_region.createChild("mesh")
-
         self._marker_model = MarkerListModel()
 
         self.define_standard_materials()
         self.define_standard_glyphs()
 
+        self._label_region = None
+        self._label_coordinates_field = None
+        self._mesh_region = None
+
+    def _create_label_region(self):
+        self._label_region = self._root_region.createChild("_label")
+        field_module = self._label_region.getFieldmodule()
+        with ChangeManager(field_module):
+            self._label_coordinates_field = create_field_finite_element(field_module, 'normalised', 2)
+            create_nodes(self._label_coordinates_field, [[10.0, 10.0]])
+
     def get_root_region(self):
         return self._root_region
 
     def load(self, mesh_file_location):
+        self._mesh_region = self._root_region.createChild("mesh")
         fm = self._mesh_region.getFieldmodule()
+        self._create_label_region()
         with ChangeManager(fm):
             self._mesh_region.readFile(mesh_file_location)
 
@@ -268,6 +274,12 @@ class MeshLocationModel:
     def remove_label_region(self):
         root_region = self._context.getDefaultRegion()
         root_region.removeChild(self._label_region)
+        self._label_region = None
+
+    def remove_mesh_region(self):
+        root_region = self._context.getDefaultRegion()
+        root_region.removeChild(self._mesh_region)
+        self._mesh_region = None
 
     def define_standard_glyphs(self):
         """

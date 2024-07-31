@@ -70,5 +70,6 @@ class MeshLocationScene(object):
         self._label_graphics = graphics_points
 
     def _update_graphic_point_size(self):
-        attributes = self._point_graphics.getGraphicspointattributes()
-        attributes.setBaseSize(self._point_base_size)
+        if self._point_graphics is not None:
+            attributes = self._point_graphics.getGraphicspointattributes()
+            attributes.setBaseSize(self._point_base_size)
