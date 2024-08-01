@@ -3,6 +3,7 @@ from PySide6 import QtCore
 from cmlibs.utils.zinc.field import create_field_finite_element
 from cmlibs.utils.zinc.finiteelement import create_nodes
 from cmlibs.utils.zinc.general import ChangeManager
+from cmlibs.utils.zinc.region import determine_appropriate_glyph_size
 from cmlibs.zinc.context import Context
 
 
@@ -27,7 +28,7 @@ def _create_orientation_field(node):
     node_set = node.getNodeset()
     fm = node_set.getFieldmodule()
     with ChangeManager(fm):
-        orientation_field = fm.createFieldConstant([10, 0, 0, 0, 10, 0, 0, 0, 10])
+        orientation_field = fm.createFieldConstant([1, 0, 0, 0, 1, 0, 0, 0, 1])
 
     return orientation_field
 
@@ -249,8 +250,21 @@ class MeshLocationModel:
     def get_root_region(self):
         return self._root_region
 
+    def determine_appropriate_glyph_size(self):
+        field_module = self._mesh_region.getFieldmodule()
+        with ChangeManager(field_module):
+            field_iterator = field_module.createFielditerator()
+            field = field_iterator.next()
+            while field.isValid() and not field.isTypeCoordinate():
+                field = field_iterator.next()
+
+        if field.isValid():
+            return determine_appropriate_glyph_size(self._mesh_region, field)
+
+        return 1.0
+
     def load(self, mesh_file_location):
-        self._mesh_region = self._root_region.createChild("mesh")
+        self._reset_mesh_region()
         fm = self._mesh_region.getFieldmodule()
         self._create_label_region()
         with ChangeManager(fm):
@@ -272,14 +286,13 @@ class MeshLocationModel:
         return self._label_coordinates_field
 
     def remove_label_region(self):
-        root_region = self._context.getDefaultRegion()
-        root_region.removeChild(self._label_region)
+        self._root_region.removeChild(self._label_region)
         self._label_region = None
 
-    def remove_mesh_region(self):
-        root_region = self._context.getDefaultRegion()
-        root_region.removeChild(self._mesh_region)
-        self._mesh_region = None
+    def _reset_mesh_region(self):
+        if self._mesh_region is not None:
+            self._root_region.removeChild(self._mesh_region)
+        self._mesh_region = self._root_region.createChild("mesh")
 
     def define_standard_glyphs(self):
         """

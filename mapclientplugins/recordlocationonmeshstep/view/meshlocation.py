@@ -20,6 +20,8 @@ class MeshLocationWidget(QtWidgets.QWidget):
 
         self._ui = Ui_MeshLocationWidget()
         self._ui.setupUi(self)
+        self._ui.lineEditScale.setVisible(False)
+        self._ui.labelScale.setVisible(False)
 
         self._model = model
         self._location = None
@@ -48,12 +50,12 @@ class MeshLocationWidget(QtWidgets.QWidget):
         self._ui.labelMeshLocationIdentifier.setText(identifier)
 
     def load(self, mesh_file_location):
+        self._model.load(mesh_file_location)
         self._load_settings()
 
         # self._input_hash = _generate_hash(points_file_location)
         # if self._input_hash == previous_hash:
         #     points_file_location = self.get_output_file()
-        self._model.load(mesh_file_location)
         self._scene.setup_visualisation()
         self._setup_field_combo_boxes()
 
@@ -115,16 +117,19 @@ class MeshLocationWidget(QtWidgets.QWidget):
 
     def _remove_ui_region(self):
         self._model.remove_label_region()
-        self._model.remove_mesh_region()
+        # self._model.remove_mesh_region()
 
     def _load_settings(self):
         if os.path.isfile(self._settings_file()):
             with open(self._settings_file()) as f:
                 settings = json.load(f)
 
-            if "node_size" in settings:
-                self._ui.spinBoxNodeSize.setValue(settings["node_size"])
-                self._scene.set_node_size(settings["node_size"])
+            suggested_size = self._model.determine_appropriate_glyph_size()
+            node_size = settings.get("node_size", suggested_size)
+            print(f"s: {node_size}, d: {suggested_size}")
+
+            self._ui.spinBoxNodeSize.setValue(node_size)
+            self._scene.set_node_size(node_size)
 
     def _save_settings(self):
         if not os.path.exists(self._location):
