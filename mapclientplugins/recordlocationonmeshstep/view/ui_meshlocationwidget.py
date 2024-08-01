@@ -118,50 +118,80 @@ class Ui_MeshLocationWidget(object):
 
         self.groupBoxVisibility = QGroupBox(MeshLocationWidget)
         self.groupBoxVisibility.setObjectName(u"groupBoxVisibility")
-        self.verticalLayout_6 = QVBoxLayout(self.groupBoxVisibility)
-        self.verticalLayout_6.setObjectName(u"verticalLayout_6")
+        self.verticalLayout_2 = QVBoxLayout(self.groupBoxVisibility)
+        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.checkBoxSurfacesVisibility = QCheckBox(self.groupBoxVisibility)
         self.checkBoxSurfacesVisibility.setObjectName(u"checkBoxSurfacesVisibility")
         self.checkBoxSurfacesVisibility.setChecked(True)
 
-        self.verticalLayout_6.addWidget(self.checkBoxSurfacesVisibility)
+        self.verticalLayout_2.addWidget(self.checkBoxSurfacesVisibility)
 
         self.checkBoxMeshVisibility = QCheckBox(self.groupBoxVisibility)
         self.checkBoxMeshVisibility.setObjectName(u"checkBoxMeshVisibility")
         self.checkBoxMeshVisibility.setChecked(True)
 
-        self.verticalLayout_6.addWidget(self.checkBoxMeshVisibility)
+        self.verticalLayout_2.addWidget(self.checkBoxMeshVisibility)
 
         self.gridLayout = QGridLayout()
         self.gridLayout.setObjectName(u"gridLayout")
-        self.labelNodeSize = QLabel(self.groupBoxVisibility)
-        self.labelNodeSize.setObjectName(u"labelNodeSize")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Preferred)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.labelNodeSize.sizePolicy().hasHeightForWidth())
-        self.labelNodeSize.setSizePolicy(sizePolicy1)
-
-        self.gridLayout.addWidget(self.labelNodeSize, 0, 0, 1, 1)
-
         self.spinBoxNodeSize = QDoubleSpinBox(self.groupBoxVisibility)
         self.spinBoxNodeSize.setObjectName(u"spinBoxNodeSize")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
-        sizePolicy2.setHorizontalStretch(0)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.spinBoxNodeSize.sizePolicy().hasHeightForWidth())
-        self.spinBoxNodeSize.setSizePolicy(sizePolicy2)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.spinBoxNodeSize.sizePolicy().hasHeightForWidth())
+        self.spinBoxNodeSize.setSizePolicy(sizePolicy1)
+        self.spinBoxNodeSize.setDecimals(4)
+        self.spinBoxNodeSize.setMaximum(99999.990000000005239)
         self.spinBoxNodeSize.setSingleStep(0.100000000000000)
 
         self.gridLayout.addWidget(self.spinBoxNodeSize, 0, 1, 1, 1)
 
+        self.labelNodeSize = QLabel(self.groupBoxVisibility)
+        self.labelNodeSize.setObjectName(u"labelNodeSize")
+        sizePolicy2 = QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Preferred)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.labelNodeSize.sizePolicy().hasHeightForWidth())
+        self.labelNodeSize.setSizePolicy(sizePolicy2)
 
-        self.verticalLayout_6.addLayout(self.gridLayout)
+        self.gridLayout.addWidget(self.labelNodeSize, 0, 0, 1, 1)
+
+        self.pushButtonResetNodeSize = QPushButton(self.groupBoxVisibility)
+        self.pushButtonResetNodeSize.setObjectName(u"pushButtonResetNodeSize")
+
+        self.gridLayout.addWidget(self.pushButtonResetNodeSize, 0, 2, 1, 1)
+
+
+        self.verticalLayout_2.addLayout(self.gridLayout)
+
+        self.horizontalLayout_4 = QHBoxLayout()
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        self.labelAxisScale = QLabel(self.groupBoxVisibility)
+        self.labelAxisScale.setObjectName(u"labelAxisScale")
+        sizePolicy2.setHeightForWidth(self.labelAxisScale.sizePolicy().hasHeightForWidth())
+        self.labelAxisScale.setSizePolicy(sizePolicy2)
+
+        self.horizontalLayout_4.addWidget(self.labelAxisScale)
+
+        self.spinBoxAxisScale = QDoubleSpinBox(self.groupBoxVisibility)
+        self.spinBoxAxisScale.setObjectName(u"spinBoxAxisScale")
+        sizePolicy1.setHeightForWidth(self.spinBoxAxisScale.sizePolicy().hasHeightForWidth())
+        self.spinBoxAxisScale.setSizePolicy(sizePolicy1)
+        self.spinBoxAxisScale.setDecimals(4)
+        self.spinBoxAxisScale.setMaximum(99999.990000000005239)
+        self.spinBoxAxisScale.setSingleStep(0.100000000000000)
+        self.spinBoxAxisScale.setValue(1.000000000000000)
+
+        self.horizontalLayout_4.addWidget(self.spinBoxAxisScale)
+
+
+        self.verticalLayout_2.addLayout(self.horizontalLayout_4)
 
 
         self.verticalLayout.addWidget(self.groupBoxVisibility)
 
-        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.verticalLayout.addItem(self.verticalSpacer)
 
@@ -237,6 +267,11 @@ class Ui_MeshLocationWidget(object):
         self.checkBoxSurfacesVisibility.setText(QCoreApplication.translate("MeshLocationWidget", u"Surfaces", None))
         self.checkBoxMeshVisibility.setText(QCoreApplication.translate("MeshLocationWidget", u"Mesh", None))
         self.labelNodeSize.setText(QCoreApplication.translate("MeshLocationWidget", u"Node Size:", None))
+#if QT_CONFIG(tooltip)
+        self.pushButtonResetNodeSize.setToolTip(QCoreApplication.translate("MeshLocationWidget", u"Reset node size to appropriate size for current mesh.", None))
+#endif // QT_CONFIG(tooltip)
+        self.pushButtonResetNodeSize.setText(QCoreApplication.translate("MeshLocationWidget", u"Reset", None))
+        self.labelAxisScale.setText(QCoreApplication.translate("MeshLocationWidget", u"Axis Scale:", None))
         self.groupBoxView.setTitle(QCoreApplication.translate("MeshLocationWidget", u"View", None))
         self.pushButtonViewAll.setText(QCoreApplication.translate("MeshLocationWidget", u"View All", None))
         self.groupBoxGeneral.setTitle(QCoreApplication.translate("MeshLocationWidget", u"General", None))
