@@ -79,6 +79,8 @@ class MeshLocationWidget(QtWidgets.QWidget):
         self._ui.widgetZinc.pixel_scale_changed.connect(self._pixel_scale_changed)
         self._ui.checkBoxMeshVisibility.stateChanged.connect(self._scene.set_mesh_visibility)
         self._ui.spinBoxNodeSize.valueChanged.connect(self._scene.set_node_size)
+        self._ui.spinBoxAxisScale.valueChanged.connect(self._model.set_axis_scale)
+        self._ui.pushButtonResetNodeSize.clicked.connect(self._reset_node_size_clicked)
         selection_model = self._ui.listViewMarkers.selectionModel()
         selection_model.currentRowChanged.connect(self._widget_mapper.setCurrentModelIndex)
 
@@ -110,6 +112,10 @@ class MeshLocationWidget(QtWidgets.QWidget):
     def _view_all_button_clicked(self):
         self._ui.widgetZinc.view_all()
 
+    def _reset_node_size_clicked(self):
+        size = self._model.determine_appropriate_glyph_size()
+        self._ui.spinBoxNodeSize.setValue(size)
+
     def _continue_execution(self):
         self._save_settings()
         self._remove_ui_region()
@@ -117,7 +123,6 @@ class MeshLocationWidget(QtWidgets.QWidget):
 
     def _remove_ui_region(self):
         self._model.remove_label_region()
-        # self._model.remove_mesh_region()
 
     def _load_settings(self):
         if os.path.isfile(self._settings_file()):
@@ -126,10 +131,14 @@ class MeshLocationWidget(QtWidgets.QWidget):
 
             suggested_size = self._model.determine_appropriate_glyph_size()
             node_size = settings.get("node_size", suggested_size)
-            print(f"s: {node_size}, d: {suggested_size}")
+            axis_scale = settings.get("axis_scale", 1.0)
+            surfaces_visible = settings.get("surfaces_visible", False)
+            mesh_visible = settings.get("mesh_visible", True)
 
             self._ui.spinBoxNodeSize.setValue(node_size)
-            self._scene.set_node_size(node_size)
+            self._ui.spinBoxAxisScale.setValue(axis_scale)
+            self._ui.checkBoxMeshVisibility.setChecked(mesh_visible)
+            self._ui.checkBoxSurfacesVisibility.setChecked(surfaces_visible)
 
     def _save_settings(self):
         if not os.path.exists(self._location):
@@ -137,17 +146,10 @@ class MeshLocationWidget(QtWidgets.QWidget):
 
         settings = {
             "node_size": self._ui.spinBoxNodeSize.value(),
+            "axis_scale": self._ui.spinBoxAxisScale.value(),
+            "mesh_visible": self._ui.checkBoxMeshVisibility.isChecked(),
+            "surfaces_visible": self._ui.checkBoxSurfacesVisibility.isChecked(),
         }
 
         with open(self._settings_file(), "w") as f:
             json.dump(settings, f)
-
-
-def _calculate_best_fit_plane(points):
-    actual_points = np.array(points).transpose()
-    centroid = np.mean(actual_points, axis=1, keepdims=True)
-    # subtract out the centroid and take the SVD
-    U, S, Vh = np.linalg.svd(actual_points - centroid)
-
-    return centroid.reshape(-1).tolist(), U[:, -1].tolist()
-

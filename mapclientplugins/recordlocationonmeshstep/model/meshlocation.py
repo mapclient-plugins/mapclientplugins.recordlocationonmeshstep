@@ -5,6 +5,7 @@ from cmlibs.utils.zinc.finiteelement import create_nodes
 from cmlibs.utils.zinc.general import ChangeManager
 from cmlibs.utils.zinc.region import determine_appropriate_glyph_size
 from cmlibs.zinc.context import Context
+from cmlibs.zinc.field import Field
 
 
 def _add_label_field(node):
@@ -28,9 +29,10 @@ def _create_orientation_field(node):
     node_set = node.getNodeset()
     fm = node_set.getFieldmodule()
     with ChangeManager(fm):
+        orientation_scale_field = fm.createFieldConstant([1.0, 1.0, 1.0])
         orientation_field = fm.createFieldConstant([1, 0, 0, 0, 1, 0, 0, 0, 1])
 
-    return orientation_field
+    return orientation_scale_field, orientation_field
 
 
 class Marker:
@@ -39,64 +41,69 @@ class Marker:
         self._node = node
         self._coordinate_field = coordinate_field
         self._label_field = _add_label_field(node)
-        self._orientation_field = _create_orientation_field(node)
+        self._orientation_scale_field, self._orientation_field = _create_orientation_field(node)
         self._pixel_scale = [1, 1, 1]
         self.set_name('unnamed')
 
     def identifier(self):
         return self._node.getIdentifier()
 
-    def name(self):
-        node_set = self._node.getNodeset()
-        fm = node_set.getFieldmodule()
-        with ChangeManager(fm):
-            fc = fm.createFieldcache()
-            fc.setNode(self._node)
-            label = self._label_field.evaluateString(fc)
-
-        return label
-
     def field(self, name='coordinate'):
         if name == 'coordinate':
             return self._coordinate_field
         elif name == 'orientation':
             return self._orientation_field
+        elif name == 'orientation_scale':
+            return self._orientation_scale_field
         elif name == 'label':
             return self._label_field
 
     def set_name(self, name):
-        node_set = self._node.getNodeset()
-        fm = node_set.getFieldmodule()
-        with ChangeManager(fm):
-            fc = fm.createFieldcache()
-            fc.setNode(self._node)
-            self._label_field.assignString(fc, name)
+        self._update_field(self._label_field, name)
+
+    def set_orientation_scale(self, scale):
+        self._update_field(self._orientation_scale_field, [scale] * self._orientation_scale_field.getNumberOfComponents())
 
     def scale(self):
         return f'{self._pixel_scale}'
 
-    def orientation(self):
-        node_set = self._node.getNodeset()
-        fm = node_set.getFieldmodule()
-        with ChangeManager(fm):
-            fc = fm.createFieldcache()
-            fc.setNode(self._node)
-            result, value = self._orientation_field.evaluateReal(fc, 9)
+    def name(self):
+        return self._read_field(self._label_field)
 
-        return f'{value}'
+    def orientation(self):
+        return self._read_field(self._orientation_field)
 
     def position(self):
-        node_set = self._node.getNodeset()
-        fm = node_set.getFieldmodule()
-        with ChangeManager(fm):
-            fc = fm.createFieldcache()
-            fc.setNode(self._node)
-            result, value = self._coordinate_field.evaluateReal(fc, 3)
-
-        return f'{value}'
+        return self._read_field(self._coordinate_field)
 
     def set_scale(self, scale):
         self._pixel_scale = scale
+
+    def _read_field(self, field):
+        fm, fc = self._node_fm_fc()
+        with ChangeManager(fm):
+            if field.getValueType() == Field.VALUE_TYPE_REAL:
+                result, value = field.evaluateReal(fc, field.getNumberOfComponents())
+            elif field.getValueType() == Field.VALUE_TYPE_STRING:
+                value = self._label_field.evaluateString(fc)
+
+        return f'{value}'
+
+    def _update_field(self, field, value):
+        fm, fc = self._node_fm_fc()
+        with ChangeManager(fm):
+            if field.getValueType() == Field.VALUE_TYPE_REAL:
+                field.assignReal(fc, value)
+            elif field.getValueType() == Field.VALUE_TYPE_STRING:
+                field.assignString(fc, value)
+
+    def _node_fm_fc(self):
+        node_set = self._node.getNodeset()
+        fm = node_set.getFieldmodule()
+        fc = fm.createFieldcache()
+        fc.setNode(self._node)
+
+        return fm, fc
 
 
 class MarkerListModel(QtCore.QAbstractTableModel):
@@ -104,6 +111,7 @@ class MarkerListModel(QtCore.QAbstractTableModel):
     def __init__(self):
         super().__init__()
         self._markers = []
+        self._initial_orientation_scale = 1.0
 
     def rowCount(self, parent=QtCore.QModelIndex()):
         return len(self._markers)
@@ -176,6 +184,13 @@ class MarkerListModel(QtCore.QAbstractTableModel):
         self._markers = markers
         self.endResetModel()
 
+    def set_orientation_scale(self, scale):
+        for m in self._markers:
+            m.set_orientation_scale(scale)
+
+    def set_initial_orientation_scale(self, scale):
+        self._initial_orientation_scale = scale
+
     def serialise(self):
         p = []
         for marker in self._markers:
@@ -194,6 +209,7 @@ class MarkerListModel(QtCore.QAbstractTableModel):
 
     def new(self, node, coordinate_field):
         m = Marker(node, coordinate_field)
+        m.set_orientation_scale(self._initial_orientation_scale)
         self.append_data(m)
 
     def update(self, node, parameter=None):
@@ -289,10 +305,9 @@ class MeshLocationModel:
         self._root_region.removeChild(self._label_region)
         self._label_region = None
 
-    def _reset_mesh_region(self):
-        if self._mesh_region is not None:
-            self._root_region.removeChild(self._mesh_region)
-        self._mesh_region = self._root_region.createChild("mesh")
+    def set_axis_scale(self, scale):
+        self._marker_model.set_initial_orientation_scale(scale)
+        self._marker_model.set_orientation_scale(scale)
 
     def define_standard_glyphs(self):
         """
@@ -307,3 +322,8 @@ class MeshLocationModel:
         """
         material_module = self._context.getMaterialmodule()
         material_module.defineStandardMaterials()
+
+    def _reset_mesh_region(self):
+        if self._mesh_region is not None:
+            self._root_region.removeChild(self._mesh_region)
+        self._mesh_region = self._root_region.createChild("mesh")
