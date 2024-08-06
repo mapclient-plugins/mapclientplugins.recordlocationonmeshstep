@@ -77,7 +77,7 @@ class MeshLocationWidget(QtWidgets.QWidget):
         self._ui.widgetZinc.graphics_initialized.connect(self._zinc_widget_ready)
         self._ui.widgetZinc.handler_activated.connect(self._update_label_text)
         self._ui.widgetZinc.pixel_scale_changed.connect(self._pixel_scale_changed)
-        self._ui.checkBoxMeshVisibility.stateChanged.connect(self._scene.set_mesh_visibility)
+        self._ui.checkBoxLinesVisibility.stateChanged.connect(self._scene.set_lines_visibility)
         self._ui.spinBoxNodeSize.valueChanged.connect(self._scene.set_node_size)
         self._ui.spinBoxAxisScale.valueChanged.connect(self._model.set_axis_scale)
         self._ui.pushButtonResetNodeSize.clicked.connect(self._reset_node_size_clicked)
@@ -133,11 +133,11 @@ class MeshLocationWidget(QtWidgets.QWidget):
             node_size = settings.get("node_size", suggested_size)
             axis_scale = settings.get("axis_scale", 1.0)
             surfaces_visible = settings.get("surfaces_visible", False)
-            mesh_visible = settings.get("mesh_visible", True)
+            lines_visible = settings.get("lines_visible", True)
 
             self._ui.spinBoxNodeSize.setValue(node_size)
             self._ui.spinBoxAxisScale.setValue(axis_scale)
-            self._ui.checkBoxMeshVisibility.setChecked(mesh_visible)
+            self._ui.checkBoxLinesVisibility.setChecked(lines_visible)
             self._ui.checkBoxSurfacesVisibility.setChecked(surfaces_visible)
 
     def _save_settings(self):
@@ -147,7 +147,7 @@ class MeshLocationWidget(QtWidgets.QWidget):
         settings = {
             "node_size": self._ui.spinBoxNodeSize.value(),
             "axis_scale": self._ui.spinBoxAxisScale.value(),
-            "mesh_visible": self._ui.checkBoxMeshVisibility.isChecked(),
+            "lines_visible": self._ui.checkBoxLinesVisibility.isChecked(),
             "surfaces_visible": self._ui.checkBoxSurfacesVisibility.isChecked(),
         }
 

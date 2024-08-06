@@ -14,7 +14,7 @@ class MeshLocationScene(object):
         self._pixel_scale = 1.0
         self._point_base_size = 1.0 * self._pixel_scale
 
-    def set_mesh_visibility(self, state):
+    def set_lines_visibility(self, state):
         self._mesh_lines.setVisibilityFlag(state != 0)
 
     def update_mesh_coordinates(self, coordinate_field):
