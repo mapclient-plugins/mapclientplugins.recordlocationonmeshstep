@@ -126,11 +126,11 @@ class Ui_MeshLocationWidget(object):
 
         self.verticalLayout_2.addWidget(self.checkBoxSurfacesVisibility)
 
-        self.checkBoxMeshVisibility = QCheckBox(self.groupBoxVisibility)
-        self.checkBoxMeshVisibility.setObjectName(u"checkBoxMeshVisibility")
-        self.checkBoxMeshVisibility.setChecked(True)
+        self.checkBoxLinesVisibility = QCheckBox(self.groupBoxVisibility)
+        self.checkBoxLinesVisibility.setObjectName(u"checkBoxLinesVisibility")
+        self.checkBoxLinesVisibility.setChecked(True)
 
-        self.verticalLayout_2.addWidget(self.checkBoxMeshVisibility)
+        self.verticalLayout_2.addWidget(self.checkBoxLinesVisibility)
 
         self.gridLayout = QGridLayout()
         self.gridLayout.setObjectName(u"gridLayout")
@@ -265,7 +265,7 @@ class Ui_MeshLocationWidget(object):
         self.labelScale.setText(QCoreApplication.translate("MeshLocationWidget", u"Pixel Scale:", None))
         self.groupBoxVisibility.setTitle(QCoreApplication.translate("MeshLocationWidget", u"Visibility", None))
         self.checkBoxSurfacesVisibility.setText(QCoreApplication.translate("MeshLocationWidget", u"Surfaces", None))
-        self.checkBoxMeshVisibility.setText(QCoreApplication.translate("MeshLocationWidget", u"Mesh", None))
+        self.checkBoxLinesVisibility.setText(QCoreApplication.translate("MeshLocationWidget", u"Lines", None))
         self.labelNodeSize.setText(QCoreApplication.translate("MeshLocationWidget", u"Node Size:", None))
 #if QT_CONFIG(tooltip)
         self.pushButtonResetNodeSize.setToolTip(QCoreApplication.translate("MeshLocationWidget", u"Reset node size to appropriate size for current mesh.", None))
