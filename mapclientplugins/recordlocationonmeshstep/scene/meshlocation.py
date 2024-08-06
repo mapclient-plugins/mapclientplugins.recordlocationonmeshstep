@@ -1,6 +1,7 @@
 from cmlibs.utils.zinc.general import ChangeManager
 from cmlibs.zinc.field import Field
 from cmlibs.zinc.glyph import Glyph
+from cmlibs.zinc.graphics import Graphics
 from cmlibs.zinc.scenecoordinatesystem import SCENECOORDINATESYSTEM_WINDOW_PIXEL_BOTTOM_LEFT
 
 
@@ -58,10 +59,17 @@ class MeshLocationScene(object):
         green = mm.findMaterialByName('green')
 
         with ChangeManager(scene):
+            if self._surface_graphics is not None and self._surface_graphics_pending_state is None:
+                self._surface_graphics_pending_state = self._surface_graphics.getVisibilityFlag()
+
+            if self._mesh_lines is not None and self._lines_graphics_pending_state is None:
+                self._lines_graphics_pending_state = self._mesh_lines.getVisibilityFlag()
+
             scene.removeAllGraphics()
             line_graphic = scene.createGraphicsLines()
             line_graphic.setMaterial(green)
             surface_graphic = scene.createGraphicsSurfaces()
+            surface_graphic.setBoundaryMode(Graphics.BOUNDARY_MODE_BOUNDARY)
             point_graphic = scene.createGraphicsPoints()
             point_graphic.setFieldDomainType(Field.DOMAIN_TYPE_DATAPOINTS)
             attributes = point_graphic.getGraphicspointattributes()
