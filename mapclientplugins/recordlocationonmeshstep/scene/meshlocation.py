@@ -9,17 +9,25 @@ class MeshLocationScene(object):
     def __init__(self, model):
         self._model = model
         self._mesh_lines = None
+        self._lines_graphics_pending_state = None
         self._surface_graphics = None
+        self._surface_graphics_pending_state = None
         self._label_graphics = None
         self._point_graphics = None
         self._pixel_scale = 1.0
         self._point_base_size = 1.0 * self._pixel_scale
 
     def set_lines_visibility(self, state):
-        self._mesh_lines.setVisibilityFlag(state != 0)
+        if self._mesh_lines is None:
+            self._lines_graphics_pending_state = state
+        else:
+            self._mesh_lines.setVisibilityFlag(state != 0)
 
     def set_surface_visibility(self, state):
-        self._surface_graphics.setVisibilityFlag(state != 0)
+        if self._surface_graphics is None:
+            self._surface_graphics_pending_state = state
+        else:
+            self._surface_graphics.setVisibilityFlag(state != 0)
 
     def update_mesh_coordinates(self, coordinate_field):
         self._mesh_lines.setCoordinateField(coordinate_field)
@@ -63,6 +71,14 @@ class MeshLocationScene(object):
         self._mesh_lines = line_graphic
         self._surface_graphics = surface_graphic
         self._point_graphics = point_graphic
+
+        if self._surface_graphics_pending_state is not None:
+            self.set_surface_visibility(self._surface_graphics_pending_state)
+            self._surface_graphics_pending_state = None
+
+        if self._lines_graphics_pending_state is not None:
+            self.set_lines_visibility(self._lines_graphics_pending_state)
+            self._lines_graphics_pending_state = None
 
         normalised_region = self._model.get_label_region()
 
