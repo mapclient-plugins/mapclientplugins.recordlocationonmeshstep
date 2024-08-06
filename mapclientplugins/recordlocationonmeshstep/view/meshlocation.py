@@ -1,7 +1,6 @@
 import os
 import json
 
-import numpy as np
 from PySide6 import QtWidgets, QtCore
 
 from cmlibs.utils.zinc.field import find_coordinate_fields
@@ -78,6 +77,7 @@ class MeshLocationWidget(QtWidgets.QWidget):
         self._ui.widgetZinc.handler_activated.connect(self._update_label_text)
         self._ui.widgetZinc.pixel_scale_changed.connect(self._pixel_scale_changed)
         self._ui.checkBoxLinesVisibility.stateChanged.connect(self._scene.set_lines_visibility)
+        self._ui.checkBoxSurfacesVisibility.stateChanged.connect(self._scene.set_surface_visibility)
         self._ui.spinBoxNodeSize.valueChanged.connect(self._scene.set_node_size)
         self._ui.spinBoxAxisScale.valueChanged.connect(self._model.set_axis_scale)
         self._ui.pushButtonResetNodeSize.clicked.connect(self._reset_node_size_clicked)
