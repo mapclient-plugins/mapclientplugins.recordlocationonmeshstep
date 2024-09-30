@@ -43,6 +43,8 @@ class Marker:
         self._label_field = _add_label_field(node)
         self._orientation_scale_field, self._orientation_field = _create_orientation_field(node)
         self._pixel_scale = [1, 1, 1]
+        self._nearest_element = None
+        self._nearest_element_dimension = -1
         self.set_name('unnamed')
 
     def identifier(self):
@@ -63,6 +65,13 @@ class Marker:
 
     def set_orientation_scale(self, scale):
         self._update_field(self._orientation_scale_field, [scale] * self._orientation_scale_field.getNumberOfComponents())
+
+    def set_element_info(self, identifier, dimension):
+        self._nearest_element = identifier
+        self._nearest_element_dimension = dimension
+
+    def element_info(self):
+        return self._nearest_element, self._nearest_element_dimension
 
     def scale(self):
         return f'{self._pixel_scale}'
@@ -132,9 +141,7 @@ class MarkerListModel(QtCore.QAbstractTableModel):
                 return f'{section}'
 
     def data(self, index, role=QtCore.Qt.ItemDataRole.DisplayRole):
-        # print("data:", index.row(), index.column(), role)
         if index.isValid():
-            # print(role, QtCore.Qt.ItemDataRole.DisplayRole, QtCore.Qt.ItemDataRole.EditRole)
             if role == QtCore.Qt.ItemDataRole.DisplayRole or role == QtCore.Qt.ItemDataRole.EditRole:
                 if index.column() == 0:
                     return self._markers[index.row()].name()
@@ -146,7 +153,6 @@ class MarkerListModel(QtCore.QAbstractTableModel):
                 return self._markers[index.row()]
 
     def setData(self, index, value, role=QtCore.Qt.ItemDataRole.EditRole):
-        # print("set data:", index.row(), index.column(), role)
         if index.isValid():
             if role == QtCore.Qt.ItemDataRole.EditRole:
                 if index.column() == 0:
@@ -207,21 +213,29 @@ class MarkerListModel(QtCore.QAbstractTableModel):
             'locations': p
         }
 
-    def new(self, node, coordinate_field):
+    def new(self, node, coordinate_field, element_identifier, element_dimension):
         m = Marker(node, coordinate_field)
         m.set_orientation_scale(self._initial_orientation_scale)
+        m.set_element_info(element_identifier, element_dimension)
         self.append_data(m)
 
-    def update(self, node, parameter=None):
-        row = self._find(node, mode='index')
+    def update(self, node, parameter=None, payload=None):
         if parameter == 'orientation':
+            row = self._find(node, mode='index')
             index = self.index(row, 1)
             self.dataChanged.emit(index, index)
+        elif parameter == 'element_info':
+            marker = self._find(node)
+            if marker:
+                marker.set_element_info(payload[0], payload[1])
 
     def parameter(self, node, name='coordinate'):
         marker = self._find(node)
         if marker:
-            return marker.field(name)
+            if name == 'element_info':
+                return marker.element_info()
+            else:
+                return marker.field(name)
 
     def _find(self, target, mode='marker'):
         index = 0
@@ -246,6 +260,7 @@ class MeshLocationModel:
     def __init__(self):
         self._context = Context("MeshLocation")
         self._root_region = self._context.getDefaultRegion()
+        self._root_region.setName("root")
 
         self._marker_model = MarkerListModel()
 

@@ -5,6 +5,15 @@ from cmlibs.zinc.graphics import Graphics
 from cmlibs.zinc.scenecoordinatesystem import SCENECOORDINATESYSTEM_WINDOW_PIXEL_BOTTOM_LEFT
 
 
+def _add_point_graphic(scene, base_size, domain_type):
+    point_graphic = scene.createGraphicsPoints()
+    point_graphic.setFieldDomainType(domain_type)
+    attributes = point_graphic.getGraphicspointattributes()
+    attributes.setGlyphShapeType(Glyph.SHAPE_TYPE_SPHERE)
+    attributes.setBaseSize(base_size)
+    return point_graphic
+
+
 class MeshLocationScene(object):
 
     def __init__(self, model):
@@ -70,11 +79,8 @@ class MeshLocationScene(object):
             line_graphic.setMaterial(green)
             surface_graphic = scene.createGraphicsSurfaces()
             surface_graphic.setBoundaryMode(Graphics.BOUNDARY_MODE_BOUNDARY)
-            point_graphic = scene.createGraphicsPoints()
-            point_graphic.setFieldDomainType(Field.DOMAIN_TYPE_DATAPOINTS)
-            attributes = point_graphic.getGraphicspointattributes()
-            attributes.setGlyphShapeType(Glyph.SHAPE_TYPE_SPHERE)
-            attributes.setBaseSize(self._point_base_size)
+            point_graphic = _add_point_graphic(scene, self._point_base_size, Field.DOMAIN_TYPE_DATAPOINTS)
+            # e3d_graphic = _add_point_graphic(scene, self._point_base_size / 4, Field.DOMAIN_TYPE_MESH3D)
 
         self._mesh_lines = line_graphic
         self._surface_graphics = surface_graphic
